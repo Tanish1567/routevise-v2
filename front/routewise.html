@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RouteWise | Transit Intelligence</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #07131f;
+            --bg-elevated: rgba(12, 26, 41, 0.82);
+            --bg-soft: rgba(255, 255, 255, 0.08);
+            --card: rgba(255, 255, 255, 0.09);
+            --card-strong: rgba(255, 255, 255, 0.12);
+            --text: #f5fbff;
+            --muted: #9fb2c2;
+            --line: rgba(255, 255, 255, 0.12);
+            --blue: #329dff;
+            --teal: #1ed6c3;
+            --amber: #ffb84d;
+            --shadow: 0 24px 70px rgba(2, 10, 20, 0.32);
+            --hero-overlay: linear-gradient(135deg, rgba(6, 19, 31, 0.92), rgba(9, 33, 46, 0.66));
+            --body-font: "Manrope", sans-serif;
+            --heading-font: "Outfit", sans-serif;
+        }
+
+        body.light {
+            --bg: #f2f7fb;
+            --bg-elevated: rgba(255, 255, 255, 0.8);
+            --bg-soft: rgba(15, 23, 42, 0.05);
+            --card: rgba(255, 255, 255, 0.82);
+            --card-strong: rgba(255, 255, 255, 0.96);
+            --text: #112133;
+            --muted: #607285;
+            --line: rgba(17, 33, 51, 0.12);
+            --blue: #1d71f2;
+            --teal: #0f9e94;
+            --amber: #db8a1f;
+            --shadow: 0 24px 60px rgba(31, 65, 99, 0.14);
+            --hero-overlay: linear-gradient(135deg, rgba(244, 249, 253, 0.92), rgba(223, 241, 244, 0.62));
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: var(--body-font);
+            color: var(--text);
+            background:
+                radial-gradient(circle at 100% 0%, rgba(50, 157, 255, 0.22), transparent 28%),
+                radial-gradient(circle at 0% 30%, rgba(30, 214, 195, 0.18), transparent 24%),
+                linear-gradient(180deg, var(--bg) 0%, color-mix(in srgb, var(--bg) 92%, #07131f 8%) 100%);
+            overflow-x: hidden;
+            transition: background 0.35s ease, color 0.35s ease;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 44px 44px;
+            mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.32), transparent 85%);
+            z-index: -2;
+        }
+
+        .glow {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.24;
+            z-index: -1;
+            pointer-events: none;
+            animation: floatBlob 16s ease-in-out infinite;
+        }
+
+        .glow.one {
+            width: 420px;
+            height: 420px;
+            background: rgba(50, 157, 255, 0.5);
+            top: -80px;
+            right: -120px;
+        }
+
+        .glow.two {
+            width: 340px;
+            height: 340px;
+            background: rgba(30, 214, 195, 0.4);
+            left: -100px;
+            top: 34%;
+            animation-delay: -7s;
+        }
+
+        .shell {
+            width: min(1220px, calc(100% - 28px));
+            margin: 0 auto;
+        }
+
+        .nav {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 18px 0;
+            backdrop-filter: blur(18px);
+        }
+
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 14px;
+            text-decoration: none;
+            color: var(--text);
+        }
+
+        .brand-mark {
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--blue), var(--teal));
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 24px rgba(50, 157, 255, 0.26);
+        }
+
+        .brand-mark::before,
+        .brand-mark::after {
+            content: "";
+            position: absolute;
+            border-radius: 999px;
+            inset: auto;
+        }
+
+        .brand-mark::before {
+            width: 22px;
+            height: 22px;
+            border: 2px solid rgba(255, 255, 255, 0.55);
+            top: 9px;
+            left: 8px;
+            animation: spinRing 5s linear infinite;
+        }
+
+        .brand-mark::after {
+            width: 7px;
+            height: 7px;
+            background: #fff;
+            top: 16px;
+            left: 18px;
+            box-shadow: 0 0 18px rgba(255, 255, 255, 0.75);
+            animation: pulseDot 1.9s ease-in-out infinite;
+        }
+
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1;
+        }
+
+        .brand-name {
+            font-family: var(--heading-font);
+            font-size: 1.38rem;
+            font-weight: 800;
+            letter-spacing: 0.02em;
+            display: inline-block;
+            background: linear-gradient(90deg, var(--text), #d7ffff, var(--text));
+            background-size: 220% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: shimmerText 4.2s linear infinite;
+        }
+
+        .brand-sub {
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 0.76rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+        }
+
+        .nav-links,
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .nav-links a,
+        .nav-actions a,
+        .nav-actions button {
+            color: var(--muted);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.96rem;
+        }
+
+        .nav-links a:hover,
+        .nav-actions a:hover,
+        .nav-actions button:hover {
+            color: var(--text);
+        }
+
+        .theme-toggle {
+            border: 1px solid var(--line);
+            background: var(--bg-elevated);
+            border-radius: 999px;
+            padding: 10px 14px;
+            cursor: pointer;
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: translateY(-1px);
+        }
+
+        .hero {
+            padding: 28px 0 34px;
+            display: grid;
+            grid-template-columns: 1.04fr 0.96fr;
+            gap: 24px;
+            align-items: stretch;
+        }
+
+        .hero-copy,
+        .hero-visual {
+            border: 1px solid var(--line);
+            border-radius: 30px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            background: var(--card);
+        }
+
+        .hero-copy {
+            padding: 38px;
+            position: relative;
+            backdrop-filter: blur(16px);
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border-radius: 999px;
+            background: rgba(30, 214, 195, 0.12);
+            color: var(--teal);
+            border: 1px solid rgba(30, 214, 195, 0.2);
+            font-size: 0.88rem;
+            font-weight: 700;
+            margin-bottom: 18px;
+        }
+
+        .hero h1 {
+            font-family: var(--heading-font);
+            font-size: clamp(2.5rem, 5vw, 5rem);
+            line-height: 0.98;
+            margin-bottom: 16px;
+            max-width: 10ch;
+        }
+
+        .hero p {
+            color: var(--muted);
+            font-size: 1rem;
+            max-width: 62ch;
+        }
+
+        .hero-copy > p {
+            margin-bottom: 24px;
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 22px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            border-radius: 14px;
+            padding: 13px 18px;
+            border: 1px solid transparent;
+            text-decoration: none;
+            font-weight: 800;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--blue), #2b6dff);
+            color: #fff;
+            box-shadow: 0 16px 32px rgba(50, 109, 255, 0.28);
+        }
+
+        .btn-secondary {
+            background: var(--bg-elevated);
+            color: var(--text);
+            border-color: var(--line);
+        }
+
+        .hero-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .hero-stat {
+            padding: 14px;
+            border-radius: 18px;
+            background: var(--bg-soft);
+            border: 1px solid var(--line);
+        }
+
+        .hero-stat-value {
+            font-family: var(--heading-font);
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .hero-stat-label {
+            font-size: 0.84rem;
+            color: var(--muted);
+        }
+
+        .hero-visual {
+            min-height: 540px;
+            position: relative;
+            background:
+                var(--hero-overlay),
+                url("https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=1200&q=80") center/cover no-repeat;
+        }
+
+        .hero-visual::after {
+            content: "";
+            position: absolute;
+            inset: auto 0 0 0;
+            height: 42%;
+            background: linear-gradient(180deg, transparent, rgba(5, 11, 19, 0.84));
+            pointer-events: none;
+        }
+
+        .hero-panel {
+            position: absolute;
+            left: 26px;
+            right: 26px;
+            bottom: 26px;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 14px;
+            pointer-events: none;
+        }
+
+        .panel-card {
+            background: rgba(6, 15, 24, 0.66);
+            border: 1px solid rgba(255, 255, 255, 0.13);
+            border-radius: 20px;
+            padding: 18px;
+            backdrop-filter: blur(14px);
+            position: relative;
+            z-index: 2;
+            pointer-events: auto;
+        }
+
+        body.light .panel-card {
+            background: rgba(255, 255, 255, 0.72);
+        }
+
+        .panel-card h3 {
+            font-family: var(--heading-font);
+            font-size: 1.18rem;
+            margin-bottom: 10px;
+        }
+
+        .panel-card p {
+            color: #d8e7f2;
+            font-size: 0.93rem;
+        }
+
+        body.light .panel-card p {
+            color: #405366;
+        }
+
+        .mini-images {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .mini-image {
+            border-radius: 16px;
+            min-height: 112px;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background-size: cover;
+            background-position: center;
+            z-index: 2;
+            pointer-events: auto;
+        }
+
+        .mini-image::after {
+            content: attr(data-label);
+            position: absolute;
+            left: 12px;
+            bottom: 12px;
+            padding: 7px 10px;
+            border-radius: 999px;
+            background: rgba(6, 15, 24, 0.7);
+            color: #f5fbff;
+            font-size: 0.76rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+        }
+
+        .section {
+            padding: 34px 0;
+        }
+
+        .section-head {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 18px;
+            margin-bottom: 18px;
+        }
+
+        .section-head h2 {
+            font-family: var(--heading-font);
+            font-size: clamp(1.8rem, 3vw, 2.6rem);
+            margin-bottom: 8px;
+        }
+
+        .section-copy {
+            color: var(--muted);
+            max-width: 68ch;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .feature {
+            background: var(--card-strong);
+            border: 1px solid var(--line);
+            border-radius: 22px;
+            padding: 22px;
+            box-shadow: var(--shadow);
+        }
+
+        .feature-number {
+            display: inline-flex;
+            width: 34px;
+            height: 34px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 999px;
+            background: rgba(50, 157, 255, 0.12);
+            color: var(--blue);
+            font-weight: 800;
+            margin-bottom: 14px;
+        }
+
+        .feature h3 {
+            font-family: var(--heading-font);
+            font-size: 1.15rem;
+            margin-bottom: 8px;
+        }
+
+        .feature p {
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+
+        .platform-shell {
+            border-radius: 28px;
+            overflow: hidden;
+            background: linear-gradient(180deg, var(--bg-elevated), rgba(6, 13, 21, 0.72));
+            border: 1px solid var(--line);
+            box-shadow: var(--shadow);
+        }
+
+        body.light .platform-shell {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(240, 247, 251, 0.95));
+        }
+
+        .platform-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 18px;
+            padding: 18px 20px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .platform-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .meta-pill {
+            padding: 8px 12px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--muted);
+            background: var(--bg-soft);
+            border: 1px solid var(--line);
+        }
+
+        .frame-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .frame-btn {
+            border: 1px solid var(--line);
+            background: var(--bg-soft);
+            color: var(--text);
+            border-radius: 12px;
+            padding: 11px 14px;
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 0.92rem;
+            cursor: pointer;
+        }
+
+        .platform-stage {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            padding: 16px;
+            background:
+                linear-gradient(180deg, rgba(50, 157, 255, 0.08), rgba(0, 0, 0, 0)),
+                rgba(4, 10, 17, 0.48);
+            isolation: isolate;
+        }
+
+        body.light .platform-stage {
+            background:
+                linear-gradient(180deg, rgba(50, 157, 255, 0.06), rgba(255, 255, 255, 0)),
+                rgba(244, 248, 251, 0.72);
+        }
+
+        .platform-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            margin-top: 14px;
+            border-radius: 16px;
+            background: var(--bg-soft);
+            border: 1px solid var(--line);
+            color: var(--muted);
+            font-size: 0.94rem;
+            order: 2;
+            position: relative;
+            z-index: 1;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--amber);
+            box-shadow: 0 0 18px rgba(255, 184, 77, 0.5);
+            animation: pulseDot 1.7s ease-in-out infinite;
+        }
+
+        .platform-fallback {
+            display: none;
+            margin-top: 14px;
+            padding: 14px;
+            border-radius: 16px;
+            background: rgba(255, 184, 77, 0.1);
+            border: 1px solid rgba(255, 184, 77, 0.2);
+            color: var(--muted);
+            order: 3;
+            position: relative;
+            z-index: 1;
+        }
+
+        .platform-fallback.show {
+            display: block;
+        }
+
+        .platform-frame {
+            width: 100%;
+            height: min(1250px, 88vh);
+            min-height: 720px;
+            border: 1px solid var(--line);
+            border-radius: 22px;
+            display: block;
+            background: #09111b;
+            order: 1;
+            position: relative;
+            z-index: 2;
+        }
+
+        .mini-note {
+            margin-top: 16px;
+            color: var(--muted);
+            font-size: 0.92rem;
+            order: 4;
+        }
+
+        footer {
+            padding: 6px 0 34px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 0.94rem;
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(28px);
+            animation: revealUp 0.8s ease forwards;
+        }
+
+        .delay-1 { animation-delay: 0.08s; }
+        .delay-2 { animation-delay: 0.16s; }
+        .delay-3 { animation-delay: 0.24s; }
+
+        @keyframes revealUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes shimmerText {
+            0% { background-position: 0% center; }
+            100% { background-position: 200% center; }
+        }
+
+        @keyframes spinRing {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes pulseDot {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.18); opacity: 0.7; }
+        }
+
+        @keyframes floatBlob {
+            0%, 100% { transform: translate3d(0, 0, 0); }
+            50% { transform: translate3d(0, 28px, 0); }
+        }
+
+        @media (max-width: 1040px) {
+            .hero,
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-panel {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 760px) {
+            .nav {
+                flex-wrap: wrap;
+            }
+
+            .nav-links {
+                order: 3;
+                width: 100%;
+                justify-content: space-between;
+                flex-wrap: wrap;
+            }
+
+            .hero-copy {
+                padding: 26px;
+            }
+
+            .hero h1 {
+                max-width: none;
+            }
+
+            .hero-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .platform-top,
+            .section-head {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .platform-frame {
+                height: 90vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="glow one"></div>
+    <div class="glow two"></div>
+
+    <div class="shell">
+        <nav class="nav">
+            <a class="brand" href="#overview" aria-label="RouteWise home">
+                <div class="brand-mark"></div>
+                <div class="brand-text">
+                    <span class="brand-name">RouteWise</span>
+                    <span class="brand-sub">Transit Control Layer</span>
+                </div>
+            </a>
+
+            <div class="nav-links">
+                <a href="#overview">Overview</a>
+                <a href="#capabilities">Features</a>
+                <a href="#platform">Control Center</a>
+                <a href="/docs">API Docs</a>
+            </div>
+
+            <div class="nav-actions">
+                <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Toggle day and night mode">Day Mode</button>
+            </div>
+        </nav>
+
+        <section id="overview" class="hero">
+            <div class="hero-copy reveal">
+                <div class="eyebrow">Realtime public transport operations</div>
+                <h1>Make every route feel intentional.</h1>
+                <p>
+                    Forecast demand, monitor ridership, optimize service, and review network performance from one cleaner and more polished RouteWise landing experience.
+                </p>
+                <div class="actions">
+                    <a class="btn btn-primary" href="#platform">Launch Control Center</a>
+                    <a class="btn btn-secondary" id="dashboard-link" href="index1.html">Open Full Dashboard</a>
+                </div>
+                <div class="hero-stats">
+                    <div class="hero-stat">
+                        <div class="hero-stat-value">Demand</div>
+                        <div class="hero-stat-label">Passenger forecasting and peak-hour visibility</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-value">Map</div>
+                        <div class="hero-stat-label">Route, stop, and live heat inspection</div>
+                    </div>
+                    <div class="hero-stat">
+                        <div class="hero-stat-value">Schedule</div>
+                        <div class="hero-stat-label">Smarter frequency planning from actual data</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-visual reveal delay-1">
+                <div class="hero-panel">
+                    <div class="panel-card">
+                        <h3>Network command view</h3>
+                        <p>
+                            Built for route teams that need a strong visual front door and a control center that is easy to reach, inspect, and use.
+                        </p>
+                    </div>
+                    <div class="mini-images">
+                        <div
+                            class="mini-image"
+                            data-label="Control Room"
+                            style="background-image: linear-gradient(180deg, rgba(8, 15, 22, 0.18), rgba(8, 15, 22, 0.48)), url('https://images.unsplash.com/photo-1494412651409-8963ce7935a7?auto=format&fit=crop&w=900&q=80');">
+                        </div>
+                        <div
+                            class="mini-image"
+                            data-label="Urban Mobility"
+                            style="background-image: linear-gradient(180deg, rgba(8, 15, 22, 0.18), rgba(8, 15, 22, 0.48)), url('https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&w=900&q=80');">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="capabilities" class="section reveal delay-2">
+            <div class="section-head">
+                <div>
+                    <h2>What’s Included</h2>
+                    <p class="section-copy">A cleaner landing page, a working embed path, and a more polished front-end flow.</p>
+                </div>
+            </div>
+
+            <div class="feature-grid">
+                <article class="feature">
+                    <div class="feature-number">01</div>
+                    <h3>Visual refresh</h3>
+                    <p>Stock imagery, stronger layout balance, softer panels, and a cleaner hero built around the Control Center.</p>
+                </article>
+                <article class="feature">
+                    <div class="feature-number">02</div>
+                    <h3>Day and night toggle</h3>
+                    <p>The landing page now switches between light and dark themes and remembers your last choice.</p>
+                </article>
+                <article class="feature">
+                    <div class="feature-number">03</div>
+                    <h3>Safer dashboard loading</h3>
+                    <p>The embedded dashboard now uses a smart source and a visible loading state so it does not appear blank.</p>
+                </article>
+            </div>
+        </section>
+
+        <section id="platform" class="section reveal delay-3">
+            <div class="section-head">
+                <div>
+                    <h2>RouteWise Control Center</h2>
+                    <p class="section-copy">A more aesthetic control frame with direct open, reload, and fallback support.</p>
+                </div>
+            </div>
+
+            <div class="platform-shell">
+                <div class="platform-top">
+                    <div>
+                        <strong style="font-family: var(--heading-font); font-size: 1.15rem;">Operations Control Center</strong>
+                        <div class="platform-meta">
+                            <span class="meta-pill">Demand Forecasting</span>
+                            <span class="meta-pill">Route Optimization</span>
+                            <span class="meta-pill">Live Map</span>
+                        </div>
+                    </div>
+
+                    <div class="frame-actions">
+                        <button id="reload-frame" class="frame-btn" type="button">Reload</button>
+                        <a id="frame-open" class="frame-btn" href="index1.html" target="_blank" rel="noopener noreferrer">Open in New Tab</a>
+                    </div>
+                </div>
+
+                <div class="platform-stage">
+                    <iframe
+                        id="platform-frame"
+                        class="platform-frame"
+                        title="RouteWise Operations Dashboard"
+                        loading="lazy">
+                    </iframe>
+
+                    <div class="platform-status">
+                        <span class="status-dot"></span>
+                        <span id="frame-status-text">Loading the Control Center...</span>
+                    </div>
+
+                    <div id="platform-fallback" class="platform-fallback">
+                        The dashboard did not load in the frame. Use the button above to open it directly in a new tab.
+                    </div>
+
+                    <p class="mini-note">
+                        If you open this file directly from the folder, the Control Center will fall back to <code>index1.html</code>. If you run FastAPI, it will use <code>/app</code>.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            RouteWise landing page updated with theme toggle, animation, stock imagery, and a more reliable Control Center embed.
+        </footer>
+    </div>
+
+    <script>
+        const themeToggle = document.getElementById("theme-toggle");
+        const frame = document.getElementById("platform-frame");
+        const frameOpen = document.getElementById("frame-open");
+        const dashboardLink = document.getElementById("dashboard-link");
+        const reloadFrameBtn = document.getElementById("reload-frame");
+        const frameStatusText = document.getElementById("frame-status-text");
+        const frameFallback = document.getElementById("platform-fallback");
+        const storageKey = "routewise-theme";
+
+        function getDashboardUrl() {
+            const isHttp = window.location.protocol.startsWith("http");
+            return isHttp ? "/app" : "index1.html";
+        }
+
+        function applyTheme(theme) {
+            document.body.classList.toggle("light", theme === "light");
+            themeToggle.textContent = theme === "light" ? "Night Mode" : "Day Mode";
+            localStorage.setItem(storageKey, theme);
+        }
+
+        function loadFrame() {
+            const frameUrl = getDashboardUrl();
+            frameFallback.classList.remove("show");
+            frameStatusText.textContent = "Loading the Control Center...";
+            frame.src = frameUrl;
+            frameOpen.href = frameUrl;
+            dashboardLink.href = frameUrl;
+        }
+
+        themeToggle.addEventListener("click", () => {
+            const nextTheme = document.body.classList.contains("light") ? "dark" : "light";
+            applyTheme(nextTheme);
+        });
+
+        reloadFrameBtn.addEventListener("click", () => {
+            loadFrame();
+        });
+
+        frame.addEventListener("load", () => {
+            frameStatusText.textContent = "Control Center ready";
+        });
+
+        frame.addEventListener("error", () => {
+            frameStatusText.textContent = "Control Center failed to load";
+            frameFallback.classList.add("show");
+        });
+
+        window.addEventListener("DOMContentLoaded", () => {
+            const savedTheme = localStorage.getItem(storageKey) || "dark";
+            applyTheme(savedTheme);
+            loadFrame();
+
+            window.setTimeout(() => {
+                if (!frame.contentWindow && !frame.src) {
+                    frameStatusText.textContent = "Control Center failed to load";
+                    frameFallback.classList.add("show");
+                }
+            }, 2500);
+        });
+    </script>
+</body>
+</html>
